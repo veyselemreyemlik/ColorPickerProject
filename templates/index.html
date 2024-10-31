@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renk Tespiti</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Renk Tespiti</a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Ana Sayfa</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container mt-5">
+      <h2 class="text-center">Renk Tespiti</h2>
+      <p class="text-center">Bir görüntü yükleyerek en yakın rengi bulun.</p>
+
+      <!-- Görüntü Yükleme Formu -->
+      <form id="uploadForm" class="text-center">
+        <input
+          type="file"
+          id="imageInput"
+          accept="image/*"
+          class="form-control-file mb-3"
+        />
+        <button type="button" onclick="detectColor()" class="btn btn-primary">
+          Renk Tespit Et
+        </button>
+      </form>
+
+      <!-- Sonuç Gösterimi -->
+      <div id="result" class="text-center mt-5"></div>
+    </div>
+
+    <script>
+      function detectColor() {
+        const formData = new FormData();
+        const fileInput = document.getElementById("imageInput");
+
+        if (fileInput.files.length === 0) {
+          alert("Lütfen bir görüntü seçin.");
+          return;
+        }
+
+        formData.append("image", fileInput.files[0]);
+
+        fetch("/detect-color", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const resultDiv = document.getElementById("result");
+            if (data.closest_color) {
+              resultDiv.innerHTML = `<h4 class="text-success">En Yakın Renk: ${
+                data.closest_color
+              }</h4>
+                                           <p>RGB: ${data.rgb.join(", ")}</p>`;
+            } else {
+              resultDiv.innerHTML = `<p class="text-danger">Hata: ${data.error}</p>`;
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+  </body>
+</html>
