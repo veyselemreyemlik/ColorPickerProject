@@ -1,15 +1,23 @@
-from flask import Flask, render_template
-from api import api_bp
+from flask import Flask, render_template, request, jsonify
+import json
 
 app = Flask(__name__)
 
-# API Blueprint kaydet
-app.register_blueprint(api_bp)
+# Renk veri setini yükle
+with open('colors.json', 'r') as f:
+    color_data = json.load(f)
 
-# Ana sayfa rotası
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
+
+@app.route('/save_color', methods=['POST'])
+def save_color():
+    color = request.json.get('color')
+    # Kaydetme işlemi (bir veritabanına veya dosyaya yazabilirsiniz)
+    # Şimdilik sadece geri döndürüyoruz.
+    return jsonify({"status": "success", "color": color})
 
 if __name__ == '__main__':
     app.run(debug=True)
+
